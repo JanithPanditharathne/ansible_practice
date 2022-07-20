@@ -1,8 +1,12 @@
+[workstations]
+172.31.80.223 ansible_user=centos
+
 [web_servers]
-172.31.89.51 ansible_user=ubuntu
+172.31.89.51 ansible_user=ubuntu 
+172.31.80.223 ansible_user=centos 
 
 [db_servers]
-172.31.80.189 ansible_user=ubuntu
+172.31.80.189 ansible_user=ubuntu 
 
 [file_servers]
-172.31.80.223
+172.31.80.223 ansible_user=centos
