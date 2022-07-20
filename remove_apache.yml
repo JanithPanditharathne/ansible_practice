@@ -1,0 +1,13 @@
+---
+
+- hosts: all
+  become: true
+  tasks:
+    - name: Update Repository Index 
+      yum: 
+        update_cache: yes
+    - name: Install Apache Server
+      yum:
+        name: httpd
+        state: absent
+     
