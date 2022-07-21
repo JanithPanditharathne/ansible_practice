@@ -2,130 +2,43 @@
 
 - hosts: all
   become: true
-  tasks:
+  pre_tasks:
  
-   - name: update repo cache (CentOS)
+   - name: update repository index (CentOS)
      tags: always
      yum:
        update_cache: yes
      changed_when: false
      when: ansible_distribution == "CentOS"
  
-   - name: update repo cache (Ubuntu)
+   - name: update repository index (Ubuntu)
      tags: always
      apt:
        update_cache: yes
      changed_when: false
      when: ansible_distribution == "Ubuntu"
-
+ 
 - hosts: all
   become: true
-  tasks: 
-  
-  - name: adding ssh keys
-    tags: always
-    authorized_key: 
-      user: devops
-      key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC7lGt2olq6TZUDNBnLaM/+S9WhniPLgzNWfeOLUVnp33W3s6Gy/Ouy3Oi0pkgMzbF6b0r3tWkq9VNU3/noGsPENZcbVfdEMI1kBnJL/M9vvpVJqanWj+Xlm2c63yodwM4ZVBIpXYz11GeEV5wcbue7oS/h27VO0rPHg9stynO0MVrg86k0NK0mJ8wFP3MUQUCm09WehYfu4BvlN7sGIQOntQNL9/clfA1Sen27HFv7+m88Uw6hQzJVgqo2nIwBEZUWz8AwzYZbVrOvrAcaHsDuPusO8fFnFKxBd8q921BqHvXyQ+yimROeOiJIakKhjz3r5/FbKqJrsigHhD+9yme7 centos@ip-172-31-18-99.ec2.internal"
-
-
+  roles:
+    - base
+    
 - hosts: workstations
   become: true
-  tasks:
-
-  - name: install unzip
-    package:
-      name: unzip
+  roles:
+    - workstations
  
-  - name: install terraform
-    unarchive:
-      src: https://releases.hashicorp.com/terraform/1.2.5/terraform_1.2.5_linux_386.zip
-      dest: /usr/local/bin
-      remote_src: yes
-      mode: 0755
-      owner: root
-      group: root
-
 - hosts: web_servers
   become: true
-  tasks:
+  roles:
+    - web_servers
  
-  - name: install apache and php for Ubuntu servers
-    tags: apache, apache2, ubuntu
-    apt:
-      name:
-        - apache2
-        - libapache2-mod-php
-      state: latest
-    when: ansible_distribution == "Ubuntu"
- 
-  - name: install apache and php for CentOS servers
-    tags: apache, httpd, centos
-    yum: 
-      name:
-        - httpd
-        - php
-      state: latest
-    when: ansible_distribution == "CentOS"
-
-  - name: start & enable httpd (CentOS)
-    tags: apache, centos, httpd
-    service: 
-      name: httpd
-      state: started
-      enabled: yes
-    when: ansible_distribution == "CentOS"
-
-  - name: change email for admin
-    tags: apache, httpd, centos
-    lineinfile:
-      path: /etc/httpd/conf/httpd.conf
-      regexp: '^ServerAdmin'
-      line: ServerAdmin somebody@gmail.com
-    when: ansible_distribution == "CentOS"
-    register: httpd
-
-  - name: restart httpd (CentOS)
-    tags: httpd, apache, centos
-    service: 
-      name: httpd
-      state: restarted
-    when: httpd.changed
-    
-
-  - name: copy html file for site
-    tags: apache, apache2,httpd
-    copy:
-      src: ./files/default_site.html
-      dest: /var/www/html/index.html
-      owner: root
-      group: root
-      mode: 0644 
-
 - hosts: db_servers
-  become : true
-  tasks: 
-  
-  - name: install mariadb package (CentOS)
-    tags: db, mariadb, centos
-    yum:
-      name: mariadb-server
-      state: latest
-    when: ansible_distribution == "CentOS"
-
-  - name: install mariadb package (Ubuntu)
-    tags: db, mariadb, ubuntu
-    apt:
-      name: mariadb-server
-      state: latest
-    when: ansible_distribution == "Ubuntu"
-
+  become: true
+  roles:
+    - db_servers
+ 
 - hosts: file_servers
   become: true
-  tasks:
-    
-  - name: install samba package
-    tags: samba
-    package:
-      name: samba
-      state: latest 
+  roles:
+    - file_servers
