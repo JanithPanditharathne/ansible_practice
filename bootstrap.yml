@@ -1,0 +1,44 @@
+---
+
+- hosts: all
+  become: true
+  tasks:
+ 
+   - name: install updates (CentOS)
+     tags: always
+     yum:
+       update_only: yes
+       update_cache: yes
+     when: ansible_distribution == "CentOS"
+ 
+   - name: install updates (Ubuntu)
+     tags: always
+     apt:
+       upgrade: dist
+       update_cache: yes
+     when: ansible_distribution == "Ubuntu"
+
+- hosts: all
+  become: true
+  tasks: 
+
+  - name: add devops user
+    tags: always
+    user: 
+      name: devops
+      group: root
+  
+  - name: adding ssh keys
+    tags: always
+    authorized_key: 
+      user: devops
+      key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC7lGt2olq6TZUDNBnLaM/+S9WhniPLgzNWfeOLUVnp33W3s6Gy/Ouy3Oi0pkgMzbF6b0r3tWkq9VNU3/noGsPENZcbVfdEMI1kBnJL/M9vvpVJqanWj+Xlm2c63yodwM4ZVBIpXYz11GeEV5wcbue7oS/h27VO0rPHg9stynO0MVrg86k0NK0mJ8wFP3MUQUCm09WehYfu4BvlN7sGIQOntQNL9/clfA1Sen27HFv7+m88Uw6hQzJVgqo2nIwBEZUWz8AwzYZbVrOvrAcaHsDuPusO8fFnFKxBd8q921BqHvXyQ+yimROeOiJIakKhjz3r5/FbKqJrsigHhD+9yme7 centos@ip-172-31-18-99.ec2.internal"
+
+  - name: add sudoers file for devops
+    tags: always
+    copy: 
+      src: sudoers_devops
+      dest: /etc/sudoers.d/devops
+      owner: root
+      group: root
+
