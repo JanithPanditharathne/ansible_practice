@@ -4,3 +4,12 @@
     user: devops
     key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC7lGt2olq6TZUDNBnLaM/+S9WhniPLgzNWfeOLUVnp33W3s6Gy/Ouy3Oi0pkgMzbF6b0r3tWkq9VNU3/noGsPENZcbVfdEMI1kBnJL/M9vvpVJqanWj+Xlm2c63yodwM4ZVBIpXYz11GeEV5wcbue7oS/h27VO0rPHg9stynO0MVrg86k0NK0mJ8wFP3MUQUCm09WehYfu4BvlN7sGIQOntQNL9/clfA1Sen27HFv7+m88Uw6hQzJVgqo2nIwBEZUWz8AwzYZbVrOvrAcaHsDuPusO8fFnFKxBd8q921BqHvXyQ+yimROeOiJIakKhjz3r5/FbKqJrsigHhD+9yme7 centos@ip-172-31-18-99.ec2.internal"
 
+- name: generate sshd config file from template
+  tags: ssh
+  template: 
+    src: "{{ ssh_template_file }}"
+    dest: /etc/ssh/sshd_config
+    owner : root
+    group: root
+    mode: 0644
+  notify: restart_sshd
